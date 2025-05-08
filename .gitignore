@@ -19,6 +19,9 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+pip-log.txt
+pip-delete-this-directory.txt
+pip-wheel-metadata/
 
 # Virtual Environment
 venv/
