@@ -1,31 +1,30 @@
 # Crypto ML Statistical Arbitrage
 
-A comprehensive framework for developing and evaluating trading strategies on the top 12 cryptocurrencies by trading volume. This project implements both machine learning and statistical arbitrage approaches for daily and intraday trading.
+A machine learning-based trading strategy framework for cryptocurrency markets. This project implements an XGBoost-based trading strategy that uses technical indicators to generate trading signals and includes a comprehensive backtesting framework.
 
 ## Features
 
-- Data collection from multiple exchanges using CCXT
-- Feature engineering with technical indicators
-- Machine learning models (XGBoost, LSTM)
-- Statistical arbitrage strategies
-- Backtesting framework
-- Performance evaluation and visualization
+- Data collection from Yahoo Finance
+- Technical indicator calculation using pandas_ta
+- Machine learning model (XGBoost) for signal generation
+- Backtesting framework with realistic trading simulation
+- Performance metrics calculation (returns, Sharpe ratio, drawdown)
+- PDF report generation for strategy analysis
 
 ## Project Structure
 
 ```
-crypto_ml_stat_arb/
-├── data/                  # Data storage
+stat_arb/
 ├── src/                   # Source code
-│   ├── data/             # Data collection and processing
-│   ├── features/         # Feature engineering
-│   ├── models/           # ML models
-│   ├── strategies/       # Trading strategies
-│   └── utils/            # Utility functions
-├── notebooks/            # Jupyter notebooks for analysis
+│   ├── features/         # Technical indicators
+│   └── strategies/       # ML trading strategy
+├── data/                 # Data storage
+├── notebooks/            # Jupyter notebooks
 ├── tests/                # Unit tests
-├── requirements.txt      # Project dependencies
-└── README.md            # Project documentation
+├── example.py           # Example usage script
+├── generate_report.py   # PDF report generator
+├── requirements.txt     # Project dependencies
+└── README.md           # Project documentation
 ```
 
 ## Setup
@@ -41,35 +40,52 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Set up environment variables:
-Create a `.env` file with your API keys:
-```
-BINANCE_API_KEY=your_key
-BINANCE_SECRET_KEY=your_secret
-```
-
 ## Usage
 
-1. Data Collection:
-```python
-from src.data.collector import DataCollector
-collector = DataCollector()
-data = collector.fetch_historical_data('BTC/USDT', '1h')
+1. Run the example script:
+```bash
+python example.py
 ```
 
-2. Feature Engineering:
-```python
-from src.features.technical import TechnicalFeatures
-features = TechnicalFeatures(data)
-processed_data = features.compute_all()
+This will:
+- Fetch historical data for BTC/USD
+- Calculate technical indicators
+- Train the ML model
+- Run a backtest
+- Save results to CSV
+
+2. Generate a detailed PDF report:
+```bash
+python generate_report.py
 ```
 
-3. Strategy Backtesting:
-```python
-from src.strategies.ml_strategy import MLStrategy
-strategy = MLStrategy(processed_data)
-results = strategy.backtest()
-```
+## Trading Strategy
+
+The strategy uses an XGBoost classifier to predict price movements based on technical indicators:
+
+1. **Signal Generation**:
+   - Buy (1): When model predicts significant upward movement
+   - Sell (-1): When model predicts significant downward movement
+   - Hold (0): When model predicts neutral movement
+
+2. **Position Management**:
+   - Buy signals: Enter full position using available cash
+   - Sell signals: Exit all positions
+   - Hold signals: Maintain current position
+
+3. **Performance Metrics**:
+   - Total Return
+   - Annual Return
+   - Sharpe Ratio
+   - Maximum Drawdown
+
+## Technical Implementation
+
+The project uses:
+- pandas_ta for technical indicators
+- XGBoost for machine learning
+- pandas for data manipulation
+- reportlab for PDF generation
 
 ## Contributing
 
