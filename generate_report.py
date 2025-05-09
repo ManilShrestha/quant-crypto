@@ -4,12 +4,17 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
+import json
 import os
 
 def create_report():
+    # Load backtest results
+    with open('backtest_results.json', 'r') as f:
+        results = json.load(f)
+    
     # Create the PDF document
     doc = SimpleDocTemplate(
-        "crypto_ml_stat_arb_report.pdf",
+        "stat_arb_report.pdf",
         pagesize=letter,
         rightMargin=72,
         leftMargin=72,
@@ -44,16 +49,16 @@ def create_report():
     story = []
     
     # Title
-    story.append(Paragraph("Cryptocurrency Machine Learning Statistical Arbitrage", styles['CustomTitle']))
+    story.append(Paragraph("S&P 500 Statistical Arbitrage Strategy", styles['CustomTitle']))
     story.append(Spacer(1, 12))
     
     # Executive Summary
     story.append(Paragraph("Executive Summary", styles['CustomHeading']))
     story.append(Paragraph(
-        "This project implements a sophisticated trading framework that combines machine learning and statistical arbitrage "
-        "strategies for cryptocurrency trading. The system is designed to analyze and trade the top 12 cryptocurrencies "
-        "by trading volume, utilizing both daily and intraday data. The framework incorporates advanced feature engineering, "
-        "machine learning models, and comprehensive backtesting capabilities to evaluate trading strategies.",
+        "This project implements a statistical arbitrage strategy focused on S&P 500 stocks. The strategy identifies "
+        "cointegrated pairs of stocks and trades their price spreads when they deviate significantly from their "
+        "historical relationship. The implementation includes sophisticated risk management, position sizing, and "
+        "correlation constraints to ensure robust performance.",
         styles['CustomBody']
     ))
     story.append(Spacer(1, 12))
@@ -68,10 +73,10 @@ def create_report():
     # Components Table
     components = [
         ["Component", "Description"],
-        ["Data Collection", "Fetches historical data from multiple exchanges using CCXT"],
-        ["Feature Engineering", "Computes technical indicators and statistical features"],
-        ["Machine Learning", "Implements XGBoost and LSTM models for prediction"],
-        ["Trading Strategies", "Combines ML predictions with statistical arbitrage"],
+        ["Data Collection", "Fetches historical data for S&P 500 stocks"],
+        ["Pairs Selection", "Identifies cointegrated pairs using statistical tests"],
+        ["Strategy Implementation", "Implements mean reversion trading logic"],
+        ["Risk Management", "Position sizing and correlation constraints"],
         ["Backtesting", "Evaluates strategy performance with realistic constraints"],
         ["Performance Analysis", "Calculates key metrics and generates visualizations"]
     ]
@@ -93,24 +98,22 @@ def create_report():
     story.append(t)
     story.append(Spacer(1, 12))
     
-    # Technical Implementation
-    story.append(Paragraph("Technical Implementation", styles['CustomHeading']))
-    story.append(Paragraph(
-        "The system is built using Python and incorporates several key technical components:",
-        styles['CustomBody']
-    ))
-    
-    # Technical Details
-    tech_details = [
-        ["Component", "Implementation Details"],
-        ["Data Collection", "Uses CCXT library for exchange connectivity\nSupports multiple timeframes\nImplements rate limiting and error handling"],
-        ["Feature Engineering", "Technical indicators using pandas_ta\nStatistical features for arbitrage\nFeature selection and normalization"],
-        ["Machine Learning", "XGBoost for classification\nLSTM for time series prediction\nCross-validation and hyperparameter tuning"],
-        ["Trading Logic", "Signal generation from ML predictions\nPosition sizing and risk management\nTransaction cost modeling"],
-        ["Backtesting", "Realistic slippage and fees\nMultiple performance metrics\nPortfolio optimization"]
+    # Strategy Parameters
+    story.append(Paragraph("Strategy Parameters", styles['CustomHeading']))
+    params = [
+        ["Parameter", "Value"],
+        ["Initial Capital", "$1,000,000"],
+        ["Position Size", "2% of capital per trade"],
+        ["Entry Threshold", "2.0 standard deviations"],
+        ["Exit Threshold", "0.0 standard deviations"],
+        ["Stop Loss", "3.0 standard deviations"],
+        ["Transaction Cost", "0.1% per trade"],
+        ["Lookback Period", "20 days"],
+        ["Max Positions", "20 concurrent pairs"],
+        ["Max Correlation", "0.8 between active pairs"]
     ]
     
-    t = Table(tech_details, colWidths=[2*inch, 4*inch])
+    t = Table(params, colWidths=[2*inch, 4*inch])
     t.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -127,24 +130,20 @@ def create_report():
     story.append(t)
     story.append(Spacer(1, 12))
     
-    # Performance Metrics
-    story.append(Paragraph("Performance Metrics", styles['CustomHeading']))
-    story.append(Paragraph(
-        "The system evaluates trading strategies using several key performance metrics:",
-        styles['CustomBody']
-    ))
-    
-    metrics = [
-        ["Metric", "Description"],
-        ["Total Return", "Overall percentage return of the strategy"],
-        ["Annual Return", "Annualized return rate"],
-        ["Sharpe Ratio", "Risk-adjusted return measure"],
-        ["Maximum Drawdown", "Largest peak-to-trough decline"],
-        ["Win Rate", "Percentage of profitable trades"],
-        ["Profit Factor", "Ratio of gross profits to gross losses"]
+    # Backtest Results
+    story.append(Paragraph("Backtest Results", styles['CustomHeading']))
+    metrics = results.get('metrics', {})
+    results_table = [
+        ["Metric", "Value"],
+        ["Total Return", f"{metrics.get('total_return', 0):.2%}"],
+        ["Sharpe Ratio", f"{metrics.get('sharpe_ratio', 0):.2f}"],
+        ["Maximum Drawdown", f"{metrics.get('max_drawdown', 0):.2%}"],
+        ["Win Rate", f"{metrics.get('win_rate', 0):.2%}"],
+        ["Profit Factor", f"{metrics.get('profit_factor', 0):.2f}"],
+        ["Total Trades", str(metrics.get('total_trades', 0))]
     ]
     
-    t = Table(metrics, colWidths=[2*inch, 4*inch])
+    t = Table(results_table, colWidths=[2*inch, 4*inch])
     t.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
@@ -159,23 +158,29 @@ def create_report():
         ('GRID', (0, 0), (-1, -1), 1, colors.black)
     ]))
     story.append(t)
+    story.append(Spacer(1, 12))
+    
+    # Analysis and Discussion
+    story.append(Paragraph("Analysis and Discussion", styles['CustomHeading']))
+    story.append(Paragraph(
+        "The backtest results demonstrate strong performance with a total return of 363.73% and an exceptional "
+        "Sharpe ratio of 32.93. The strategy shows remarkable consistency with a win rate of 66.67% and a "
+        "profit factor of 1.91. The extremely low maximum drawdown of 0.04% suggests effective risk management, "
+        "though this may warrant further investigation to ensure no look-ahead bias or other methodological issues.",
+        styles['CustomBody']
+    ))
     story.append(Spacer(1, 12))
     
     # Future Improvements
     story.append(Paragraph("Future Improvements", styles['CustomHeading']))
-    story.append(Paragraph(
-        "Several areas for future development and improvement have been identified:",
-        styles['CustomBody']
-    ))
-    
     improvements = [
-        "Implementation of deep learning models for better pattern recognition",
-        "Addition of sentiment analysis from social media and news sources",
-        "Integration with more cryptocurrency exchanges",
+        "Implementation of more sophisticated pair selection methods",
+        "Addition of regime detection to adjust strategy parameters",
+        "Integration of fundamental data for pair selection",
         "Development of real-time trading capabilities",
-        "Enhanced risk management and portfolio optimization",
-        "Implementation of market regime detection",
-        "Addition of more sophisticated statistical arbitrage strategies"
+        "Enhanced risk management with dynamic position sizing",
+        "Implementation of machine learning for pair selection",
+        "Addition of market-neutral portfolio construction"
     ]
     
     for improvement in improvements:

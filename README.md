@@ -1,28 +1,34 @@
-# Crypto ML Statistical Arbitrage
+# Equity Pairs Trading Statistical Arbitrage
 
-A machine learning-based trading strategy framework for cryptocurrency markets. This project implements an XGBoost-based trading strategy that uses technical indicators to generate trading signals and includes a comprehensive backtesting framework.
+A sophisticated statistical arbitrage framework for equity markets that implements pairs trading strategies using cointegration analysis and mean reversion principles. This project focuses on identifying and trading correlated stock pairs while maintaining market neutrality.
 
 ## Features
 
-- Data collection from Yahoo Finance
-- Technical indicator calculation using pandas_ta
-- Machine learning model (XGBoost) for signal generation
-- Backtesting framework with realistic trading simulation
-- Performance metrics calculation (returns, Sharpe ratio, drawdown)
-- PDF report generation for strategy analysis
+- Automated pairs selection using cointegration tests
+- Dynamic position sizing based on z-scores
+- Real-time signal generation using mean reversion principles
+- Comprehensive backtesting framework with transaction costs
+- Risk management and portfolio optimization
+- Interactive visualizations and performance analytics
+- Detailed PDF report generation
 
 ## Project Structure
 
 ```
-stat_arb/
+equity_stat_arb/
 ├── src/                   # Source code
-│   ├── features/         # Technical indicators
-│   └── strategies/       # ML trading strategy
+│   ├── data/             # Data collection and processing
+│   ├── analysis/         # Statistical analysis tools
+│   ├── strategy/         # Trading strategy implementation
+│   ├── backtest/         # Backtesting framework
+│   └── visualization/    # Plotting and visualization tools
 ├── data/                 # Data storage
-├── notebooks/            # Jupyter notebooks
-├── tests/                # Unit tests
-├── example.py           # Example usage script
-├── generate_report.py   # PDF report generator
+│   ├── raw/             # Raw price data
+│   └── processed/       # Processed pairs data
+├── notebooks/            # Jupyter notebooks for analysis
+├── tests/               # Unit tests
+├── config/              # Configuration files
+├── reports/             # Generated reports and visualizations
 ├── requirements.txt     # Project dependencies
 └── README.md           # Project documentation
 ```
@@ -42,49 +48,73 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. Run the example script:
+1. Data Collection:
 ```bash
-python example.py
+python src/data/collect_data.py
 ```
 
-This will:
-- Fetch historical data for BTC/USD
-- Calculate technical indicators
-- Train the ML model
-- Run a backtest
-- Save results to CSV
-
-2. Generate a detailed PDF report:
+2. Pairs Selection:
 ```bash
-python generate_report.py
+python src/analysis/select_pairs.py
+```
+
+3. Strategy Backtest:
+```bash
+python src/strategy/run_backtest.py
+```
+
+4. Generate Report:
+```bash
+python src/visualization/generate_report.py
 ```
 
 ## Trading Strategy
 
-The strategy uses an XGBoost classifier to predict price movements based on technical indicators:
+The strategy implements a sophisticated pairs trading approach:
 
-1. **Signal Generation**:
-   - Buy (1): When model predicts significant upward movement
-   - Sell (-1): When model predicts significant downward movement
-   - Hold (0): When model predicts neutral movement
+1. **Pairs Selection**:
+   - Cointegration testing using Engle-Granger method
+   - Correlation analysis
+   - Liquidity screening
+   - Sector-based grouping
 
-2. **Position Management**:
-   - Buy signals: Enter full position using available cash
-   - Sell signals: Exit all positions
-   - Hold signals: Maintain current position
+2. **Signal Generation**:
+   - Z-score calculation for spread
+   - Entry thresholds (typically ±2 standard deviations)
+   - Exit thresholds (mean reversion)
+   - Stop-loss and take-profit levels
 
-3. **Performance Metrics**:
-   - Total Return
-   - Annual Return
-   - Sharpe Ratio
-   - Maximum Drawdown
+3. **Position Management**:
+   - Market-neutral portfolio construction
+   - Dynamic position sizing
+   - Risk parity allocation
+   - Portfolio rebalancing
+
+4. **Risk Management**:
+   - Maximum position limits
+   - Sector exposure limits
+   - Drawdown controls
+   - Volatility targeting
+
+## Performance Metrics
+
+- Total Return
+- Sharpe Ratio
+- Sortino Ratio
+- Maximum Drawdown
+- Win Rate
+- Profit Factor
+- Average Trade Duration
+- Beta to Market
 
 ## Technical Implementation
 
 The project uses:
-- pandas_ta for technical indicators
-- XGBoost for machine learning
-- pandas for data manipulation
+- pandas and numpy for data manipulation
+- statsmodels for statistical analysis
+- scipy for optimization
+- matplotlib and seaborn for visualization
+- yfinance for data collection
 - reportlab for PDF generation
 
 ## Contributing
